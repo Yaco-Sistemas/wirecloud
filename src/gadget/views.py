@@ -122,9 +122,9 @@ class GadgetCollection(Resource):
 
     @no_cache
     def read(self, request, user_name=None):
-        user = user_authentication(request, user_name)
+        user_authentication(request, user_name)
 
-        gadgets = Gadget.objects.filter(users=user)
+        gadgets = Gadget.objects.all()
 
         data_list = [get_gadget_data(gadget) for gadget in gadgets]
         return HttpResponse(json_encode(data_list), mimetype='application/json; charset=UTF-8')
