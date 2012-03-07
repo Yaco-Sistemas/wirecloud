@@ -29,6 +29,7 @@
 
 
 #
+from os import path
 import time
 
 from django.db import transaction, IntegrityError
@@ -49,6 +50,9 @@ from gadget.models import Gadget, XHTML
 from gadget.utils import get_or_create_gadget, includeTagBase, fix_ezweb_scripts
 from igadget.models import IGadget
 from igadget.utils import deleteIGadget
+
+
+BASEDIR = path.dirname(path.abspath(__file__))
 
 
 def parseAndCreateGadget(request, user, workspaceId):
@@ -122,12 +126,20 @@ class GadgetCollection(Resource):
 
     @no_cache
     def read(self, request, user_name=None):
-        user_authentication(request, user_name)
-
-        gadgets = Gadget.objects.all()
-
-        data_list = [get_gadget_data(gadget) for gadget in gadgets]
-        return HttpResponse(json_encode(data_list), mimetype='application/json; charset=UTF-8')
+        try:
+            # Read generated json from file (cache)
+            f = open(path.join(BASEDIR, 'gadgets.json'), 'r')
+            data_list = f.read()
+            f.close()
+        except IOError:
+            # Missing file, generate json and write it to the file
+            gadgets = Gadget.objects.all()
+            data_list = [get_gadget_data(gadget) for gadget in gadgets]
+            data_list = json_encode(data_list)
+            f = open(path.join(BASEDIR, 'gadgets.json'), 'w')
+            f.write(data_list.encode('utf-8'))
+            f.close()
+        return HttpResponse(data_list, mimetype='application/json; charset=UTF-8')
 
     @transaction.commit_on_success
     def create(self, request, user_name=None):

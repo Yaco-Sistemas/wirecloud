@@ -28,13 +28,18 @@
 #...............................licence...........................................#
 
 
-#
+from os import path, remove
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.db.models import signals
 
 from translator.models import TransModel
+
+
+BASEDIR = path.dirname(path.abspath(__file__))
 
 
 class XHTML(models.Model):
@@ -103,6 +108,18 @@ class Gadget(TransModel):
 
     def get_related_slots(self):
         return VariableDef.objects.filter(gadget=self, aspect='SLOT')
+
+
+def handler_gadget_post_save(sender, instance, created, **kwargs):
+    remove(path.join(BASEDIR, 'gadgets.json'))
+
+
+def handler_gadget_post_delete(sender, instance, **kwargs):
+    remove(path.join(BASEDIR, 'gadgets.json'))
+
+
+signals.post_save.connect(handler_gadget_post_save, sender=Gadget)
+signals.post_delete.connect(handler_gadget_post_delete, sender=Gadget)
 
 
 class Capability(models.Model):
