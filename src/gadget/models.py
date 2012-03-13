@@ -111,11 +111,19 @@ class Gadget(TransModel):
 
 
 def handler_gadget_post_save(sender, instance, created, **kwargs):
-    remove(path.join(BASEDIR, 'gadgets.json'))
+    try:
+        remove(path.join(BASEDIR, 'gadgets.json'))
+    except OSError:
+        # The file doesn't exists
+        pass
 
 
 def handler_gadget_post_delete(sender, instance, **kwargs):
-    remove(path.join(BASEDIR, 'gadgets.json'))
+    try:
+        remove(path.join(BASEDIR, 'gadgets.json'))
+    except OSError:
+        # The file doesn't exists
+        pass
 
 
 signals.post_save.connect(handler_gadget_post_save, sender=Gadget)
