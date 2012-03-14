@@ -137,7 +137,7 @@ def SaveIGadget(igadget, user, tab, initial_variable_values):
         gadget_uri_parts = gadget_uri.split("/")
         gadget_uri = "/" + "/".join(gadget_uri_parts[gadget_uri_parts.index("gadgets"):])
 
-    gadget = Gadget.objects.get(uri=gadget_uri, users=user)
+    gadget = Gadget.objects.get(uri=gadget_uri)
 
     new_igadget = IGadget(name=igadget_name, gadget=gadget, tab=tab, layout=layout, position=position, icon_position=icon_position, transparency=False, menu_color=menu_color)
     new_igadget.save()

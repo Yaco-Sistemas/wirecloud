@@ -170,19 +170,19 @@ class GadgetEntry(Resource):
     @no_cache
     def read(self, request, vendor, name, version, user_name=None):
         user = user_authentication(request, user_name)
-        gadget = get_object_or_404(Gadget, users=user, vendor=vendor, name=name, version=version)
+        gadget = get_object_or_404(Gadget, vendor=vendor, name=name, version=version)
         data_fields = get_gadget_data(gadget)
         return HttpResponse(json_encode(data_fields), mimetype='application/json; charset=UTF-8')
 
     def update(self, request, vendor, name, version, user_name=None):
         user = user_authentication(request, user_name)
-        gadget = get_object_or_404(Gadget, users=user, vendor=vendor, name=name, version=version)
+        gadget = get_object_or_404(Gadget, vendor=vendor, name=name, version=version)
         gadget.save()
         return HttpResponse('ok')
 
     def delete(self, request, vendor, name, version, user_name=None):
         user = user_authentication(request, user_name)
-        gadget = get_object_or_404(Gadget, users=user, vendor=vendor, name=name, version=version)
+        gadget = get_object_or_404(Gadget, vendor=vendor, name=name, version=version)
         gadget.delete()
         return HttpResponse('ok')
 
@@ -191,7 +191,7 @@ class GadgetCodeEntry(Resource):
 
     def read(self, request, vendor, name, version, user_name=None):
         user = user_authentication(request, user_name)
-        gadget = get_object_or_404(Gadget, vendor=vendor, name=name, version=version, users__id=user.id)
+        gadget = get_object_or_404(Gadget, vendor=vendor, name=name, version=version)
         xhtml = gadget.xhtml
 
         content_type = xhtml.content_type
@@ -231,7 +231,7 @@ class GadgetCodeEntry(Resource):
 
     def update(self, request, vendor, name, version, user_name=None):
         user = user_authentication(request, user_name)
-        gadget = get_object_or_404(Gadget, users=user, vendor=vendor, name=name, version=version)
+        gadget = get_object_or_404(Gadget, vendor=vendor, name=name, version=version)
         xhtml = gadget.xhtml
 
         try:
