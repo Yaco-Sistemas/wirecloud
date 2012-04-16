@@ -65,24 +65,33 @@ var OpManagerFactory = function () {
 
             //Create the workspace list menu
             this.wsListMenu = new SideBarMenu(this.sideBarElement.id);
+
             //event
-            Event.observe(this.goToLauncher, 'click',
-                        function(e){
-                            LayoutManagerFactory.getInstance().toggleSideBarMenu();
-                        }.bind(this));
-            //close option
-            Event.observe($('close_sidebar'), "click",
-                        function(){
-                            this.wsListMenu.hide();
-                        }.bind(this));
-            //new workspace option
-            if (!EzSteroidsAPI.is_activated() ||
-                (EzSteroidsAPI.evaluePolicy('add_remove_workspaces') && EzSteroidsAPI.evaluePolicy('create_custom_workspaces'))) {
-                // EzWeb IE6 version does not allow creating new Workspaces
-                Event.observe($('add_workspace'), "click",
-                        function(){
-                            LayoutManagerFactory.getInstance().showWindowMenu('createWorkSpace');
-                        });
+            if (hasAdvancedBar) {
+                Event.observe(this.goToLauncher, 'click',
+                            function(e){
+                                LayoutManagerFactory.getInstance().toggleSideBarMenu();
+                            }.bind(this));
+                //close option
+                Event.observe($('close_sidebar'), "click",
+                            function(){
+                                this.wsListMenu.hide();
+                            }.bind(this));
+                //new workspace option
+                if (!EzSteroidsAPI.is_activated() ||
+                    (EzSteroidsAPI.evaluePolicy('add_remove_workspaces') && EzSteroidsAPI.evaluePolicy('create_custom_workspaces'))) {
+                    // EzWeb IE6 version does not allow creating new Workspaces
+                    Event.observe($('add_workspace'), "click",
+                            function(){
+                                LayoutManagerFactory.getInstance().showWindowMenu('createWorkSpace');
+                            });
+                }
+            } else {
+                Event.observe($('go_to_link_simple'), 'change', function (e) {
+                    var opt = e.target.options[e.target.selectedIndex];
+                    LayoutManagerFactory.getInstance().hideCover();
+                    OpManagerFactory.getInstance().changeActiveWorkSpace(opt.workSpace);
+                }.bind(this));
             }
 
 

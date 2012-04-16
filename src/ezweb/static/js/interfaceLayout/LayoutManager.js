@@ -23,6 +23,8 @@
 *     http://morfeo-project.org
  */
 
+var hasAdvancedBar = $("ws_header").style.display != "none";
+
 
 var LayoutManagerFactory = function () {
 
@@ -646,16 +648,32 @@ var LayoutManagerFactory = function () {
 
         //WorkSpaceMenu is dinamic so the different options must be added.
         LayoutManager.prototype.refreshChangeWorkSpaceMenu = function(workSpace, workspaces) {
-            var wsListMenu = OpManagerFactory.getInstance().getWsListMenu();
-            if (wsListMenu) {
-                wsListMenu.clearOptions();
+            if (hasAdvancedBar) {
+                var wsListMenu = OpManagerFactory.getInstance().getWsListMenu();
+                if (wsListMenu) {
+                    wsListMenu.clearOptions();
+                    for (var i = 0; i < workspaces.length; i += 1) {
+                        //Add to the Sidebar Menu
+                        wsListMenu.addOption(workspaces[i].workSpaceState.name,
+                            function () {
+                                LayoutManagerFactory.getInstance().hideCover();
+                                OpManagerFactory.getInstance().changeActiveWorkSpace(this)
+                            }.bind(workspaces[i]), i);
+                    }
+                }
+            } else {
+                var select = $('go_to_link_simple');
+                select.innerHTML = "";
+                var option = document.createElement('option');
+                option.text = "";
+                option.value = -1;
+                select.add(option);
                 for (var i = 0; i < workspaces.length; i += 1) {
-                    //Add to the Sidebar Menu
-                    wsListMenu.addOption(workspaces[i].workSpaceState.name,
-                        function () {
-                            LayoutManagerFactory.getInstance().hideCover();
-                            OpManagerFactory.getInstance().changeActiveWorkSpace(this)
-                        }.bind(workspaces[i]), i);
+                    option = document.createElement('option');
+                    option.text = workspaces[i].workSpaceState.name;
+                    option.value = i;
+                    option.workSpace = workspaces[i];
+                    select.add(option);
                 }
             }
         };
