@@ -248,6 +248,9 @@ class WorkSpaceCollection(Resource):
     def create(self, request):
         user = get_user_authentication(request)
 
+        if not user.is_superuser:
+            return HttpResponseForbidden("Only superusers can create workspaces")
+
         if 'workspace' not in request.POST:
             return HttpResponseBadRequest(get_xml_error(_("workspace JSON expected")), mimetype='application/xml; charset=UTF-8')
 
@@ -367,6 +370,9 @@ class TabCollection(Resource):
     @transaction.commit_on_success
     def create(self, request, workspace_id):
         user = get_user_authentication(request)
+
+        if not user.is_superuser:
+            return HttpResponseForbidden("Only superusers can create tabs")
 
         if 'tab' not in request.POST:
             return HttpResponseBadRequest(get_xml_error(_("tab JSON expected")), mimetype='application/xml; charset=UTF-8')
@@ -540,6 +546,9 @@ class WorkSpaceMergerEntry(Resource):
 
         user = get_user_authentication(request)
 
+        if not user.is_superuser:
+            return HttpResponseForbidden()
+
         packageCloner = PackageCloner()
 
         to_workspace = packageCloner.merge_workspaces(from_ws, to_ws, user)
@@ -553,6 +562,9 @@ class WorkSpaceSharerEntry(Resource):
     @transaction.commit_on_success
     def update(self, request, workspace_id, share_boolean):
         user = get_user_authentication(request)
+
+        if not user.is_superuser:
+            return HttpResponseForbidden()
 
         try:
             workspace = WorkSpace.objects.get(id=workspace_id)
@@ -603,7 +615,10 @@ class WorkSpaceSharerEntry(Resource):
 
     @no_cache
     def read(self, request, workspace_id):
-        get_user_authentication(request)
+        user = get_user_authentication(request)
+
+        if not user.is_superuser:
+            return HttpResponseForbidden()
 
         groups = []
         #read the groups that can be related to a workspace
@@ -629,6 +644,9 @@ class WorkSpaceLinkerEntry(Resource):
     def read(self, request, workspace_id):
         user = get_user_authentication(request)
 
+        if not user.is_superuser:
+            return HttpResponseForbidden()
+
         linkWorkspace(user, workspace_id)
 
         result = {"result": "ok"}
@@ -642,6 +660,9 @@ class WorkSpaceClonerEntry(Resource):
     def read(self, request, workspace_id):
         user = get_user_authentication(request)
 
+        if not user.is_superuser:
+            return HttpResponseForbidden()
+
         cloned_workspace = cloneWorkspace(workspace_id, user)
         result = {'result': 'ok', 'new_workspace_id': cloned_workspace.id}
         return HttpResponse(json_encode(result), mimetype='application/json; charset=UTF-8')
@@ -653,6 +674,9 @@ class PublishedWorkSpaceMergerEntry(Resource):
     @no_cache
     def read(self, request, published_ws_id, to_ws_id):
         user = get_user_authentication(request)
+
+        if not user.is_superuser:
+            return HttpResponseForbidden()
 
         published_workspace = get_object_or_404(PublishedWorkSpace, id=published_ws_id)
         to_ws = get_object_or_404(WorkSpace, id=to_ws_id, creator=user)
@@ -669,6 +693,9 @@ class WorkSpaceAdderEntry(Resource):
     @no_cache
     def read(self, request, workspace_id):
         user = get_user_authentication(request)
+
+        if not user.is_superuser:
+            return HttpResponseForbidden()
 
         published_workspace = get_object_or_404(PublishedWorkSpace, id=workspace_id)
         workspace, _junk = buildWorkspaceFromTemplate(published_workspace.template, user)
@@ -718,6 +745,10 @@ class WorkSpacePublisherEntry(Resource):
             return HttpResponseBadRequest(get_xml_error(msg), mimetype='application/xml; charset=UTF-8')
 
         user = get_user_authentication(request)
+
+        if not user.is_superuser:
+            return HttpResponseForbidden()
+
         workspace = get_object_or_404(WorkSpace, id=workspace_id)
 
         template = build_template_from_workspace(mashup, workspace, user)

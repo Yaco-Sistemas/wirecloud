@@ -83,7 +83,7 @@ class ConnectableEntry(Resource):
         user = get_user_authentication(request)
 
         workspace = get_object_or_404(WorkSpace, id=workspace_id)
-        if not user.is_staff and workspace.creator != user:
+        if not user.is_superuser and workspace.creator != user:
             return HttpResponseForbidden()
 
         # Gets all needed parameters from request
