@@ -235,6 +235,11 @@ function WorkSpace (workSpaceState) {
             this._lockFunc(true);
         } else {
             this._lockFunc(!this.isAllowed('change_lock_status'));
+            if (!this.isAllowed('change_lock_status')) {
+                $("add_content_simple").style.display = "none";
+            } else {
+                $("add_content_simple").style.display = "";
+            }
         }
 
         //all the modules have been downloaded. Init now all the toolbars:
