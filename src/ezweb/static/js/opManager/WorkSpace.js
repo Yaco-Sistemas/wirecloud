@@ -231,7 +231,11 @@ function WorkSpace (workSpaceState) {
         this._createWorkspaceMenu();
 
         this._update_creator_options();
-        this._lockFunc(true);
+        if (hasAdvancedBar) {
+            this._lockFunc(true);
+        } else {
+            this._lockFunc(!this.isAllowed('change_lock_status'));
+        }
 
         //all the modules have been downloaded. Init now all the toolbars:
         //catalogue, wiring and workspace.
