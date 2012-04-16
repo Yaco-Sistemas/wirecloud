@@ -23,7 +23,7 @@
 *     http://morfeo-project.org
  */
 
-var hasAdvancedBar = $("ws_header").style.display != "none";
+var hasAdvancedBar = $("ws_header").parentNode.style.display != "none";
 
 
 var LayoutManagerFactory = function () {
