@@ -493,6 +493,10 @@ var LayoutManagerFactory = function () {
                 this.showTipMessage(msg, 2);
             }
 
+            if (!hasAdvancedBar) {
+                $('ws_header_simple').style.display = "";
+            }
+
             //Firefox 3.6 bug
             document.childNodes[1].scrollTop = 0
         }
