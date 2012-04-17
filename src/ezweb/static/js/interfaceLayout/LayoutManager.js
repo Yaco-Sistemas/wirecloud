@@ -668,14 +668,16 @@ var LayoutManagerFactory = function () {
             } else {
                 var select = $('go_to_link_simple');
                 select.innerHTML = "";
+                var ws = OpManagerFactory.getInstance().activeWorkSpace;
                 var option = document.createElement('option');
-                option.text = "";
-                option.value = -1;
+                option.text = ws.workSpaceState.name;
+                option.value = 0;
+                option.workSpace = ws;
                 select.add(option);
                 for (var i = 0; i < workspaces.length; i += 1) {
                     option = document.createElement('option');
                     option.text = workspaces[i].workSpaceState.name;
-                    option.value = i;
+                    option.value = i + 1;
                     option.workSpace = workspaces[i];
                     select.add(option);
                 }
