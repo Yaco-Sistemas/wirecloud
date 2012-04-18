@@ -140,6 +140,9 @@ def createEmptyWorkSpace(workSpaceName, user):
     #Tab creation
     createTab(_('Tab'), user, workspace)
 
+    if not user.is_superuser:
+        setActiveWorkspaceByPriority(user)
+
     return workspace
 
 
@@ -342,13 +345,19 @@ class WorkSpaceEntry(Resource):
 
             if 'active' in ts:
                 active = ts['active']
-                if (active == 'true'):
-                    #Only one active workspace
-                    setActiveWorkspace(user, workspace)
+                if active == 'true':
+                    if user.is_superuser:
+                        #Only one active workspace
+                        setActiveWorkspace(user, workspace)
+                    else:
+                        setActiveWorkspaceByPriority(user)
                 else:
                     currentUserWorkspace = UserWorkSpace.objects.get(workspace=workspace, user=user)
-                    currentUserWorkspace.active = True
-                    currentUserWorkspace.save()
+                    if user.is_superuser:
+                        currentUserWorkspace.active = True
+                        currentUserWorkspace.save()
+                    else:
+                        setActiveWorkspaceByPriority(user)
 
             if 'name' in ts:
                 workspace.name = ts['name']
@@ -743,7 +752,7 @@ class WorkSpaceAdderEntry(Resource):
                 # there aren't any active workspace yet
                 activate = True
 
-        if (user.is_superuser):
+        if user.is_superuser:
             # Mark the mashup as the active workspace if it's requested. For example, solutions
             if activate:
                 setActiveWorkspace(user, workspace)
