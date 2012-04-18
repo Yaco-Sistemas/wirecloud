@@ -101,7 +101,10 @@ def createWorkSpace(workspaceName, user):
                     cloned_workspace.name = workspaceName
                     cloned_workspace.save()
 
-                    setActiveWorkspace(user, cloned_workspace)
+                    if user.is_superuser:
+                        setActiveWorkspace(user, cloned_workspace)
+                    else:
+                        setActiveWorkspaceByPriority(user)
                     break
             except Category.DoesNotExist:
                 #the user category doesn't have a new workspace
@@ -150,6 +153,33 @@ def setActiveWorkspace(user, workspace):
     currentUserWorkspace.active = True
 
     currentUserWorkspace.save()
+
+
+def setActiveWorkspaceByPriority(user, workspaces=None):
+    if workspaces is None:
+        workspaces = WorkSpace.objects.filter(users__id=user.id)
+
+    pdi = False
+    pas = False
+    students = False
+
+    for ws in workspaces:
+        if ws.name == 'PDI':
+            pdi = ws
+            break
+        elif ws.name == 'PAS':
+            pas = ws
+        elif ws.name == 'Estudiantes':
+            students = ws
+
+    if pdi:
+        setActiveWorkspace(user, pdi)
+    elif pas:
+        setActiveWorkspace(user, pas)
+    elif students:
+        setActiveWorkspace(user, students)
+    else:
+        setActiveWorkspace(user, workspaces.all()[0])
 
 
 def cloneWorkspace(workspace_id, user):
@@ -229,10 +259,13 @@ class WorkSpaceCollection(Resource):
             # Now we can fetch all the workspaces of an user
             workspaces = WorkSpace.objects.filter(users__id=user.id)
 
-            # if there is no active workspace
-            if UserWorkSpace.objects.filter(user=user, active=True).count() == 0:
-                # set the first workspace as active
-                setActiveWorkspace(user, workspaces.all()[0])
+            if user.is_superuser:
+                # if there is no active workspace
+                if UserWorkSpace.objects.filter(user=user, active=True).count() == 0:
+                    # set the first workspace as active
+                    setActiveWorkspace(user, workspaces.all()[0])
+            else:
+                setActiveWorkspaceByPriority(user, workspaces)
 
         except Exception, e:
             msg = _("error reading workspace: ") + unicode(e)
@@ -358,9 +391,12 @@ class WorkSpaceEntry(Resource):
             deleteIGadget(igadget, user)
         workspace.delete()
 
-        # Set a new active workspace (first workspace by default)
-        activeWorkspace = workspaces[0]
-        setActiveWorkspace(user, activeWorkspace)
+        if user.is_superuser:
+            # Set a new active workspace (first workspace by default)
+            activeWorkspace = workspaces[0]
+            setActiveWorkspace(user, activeWorkspace)
+        else:
+            setActiveWorkspaceByPriority(user, workspaces)
 
         return HttpResponse('ok')
 
@@ -707,9 +743,12 @@ class WorkSpaceAdderEntry(Resource):
                 # there aren't any active workspace yet
                 activate = True
 
-        # Mark the mashup as the active workspace if it's requested. For example, solutions
-        if activate:
-            setActiveWorkspace(user, workspace)
+        if (user.is_superuser):
+            # Mark the mashup as the active workspace if it's requested. For example, solutions
+            if activate:
+                setActiveWorkspace(user, workspace)
+        else:
+            setActiveWorkspaceByPriority(user)
 
         workspace_data = get_global_workspace_data(workspace, user)
 
