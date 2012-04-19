@@ -673,13 +673,13 @@ var LayoutManagerFactory = function () {
                 option.text = ws.workSpaceState.name;
                 option.value = 0;
                 option.workSpace = ws;
-                select.add(option);
+                select.add(option, null);
                 for (var i = 0; i < workspaces.length; i += 1) {
                     option = document.createElement('option');
                     option.text = workspaces[i].workSpaceState.name;
                     option.value = i + 1;
                     option.workSpace = workspaces[i];
-                    select.add(option);
+                    select.add(option, null);
                 }
             }
         };
