@@ -106,7 +106,8 @@ var OpManagerFactory = function () {
             if (reloadShowcase) {
                 //the showcase must be reloaded to have all new gadgets
                 //it itself changes to the active workspace
-                ShowcaseFactory.getInstance().reload(workSpace.id);
+                // ShowcaseFactory.getInstance().reload(workSpace.id);
+                ShowcaseFactory.getInstance().reload(activeWorkSpace.getId());
             } else {
                 this.activeWorkSpace = activeWorkSpace;
 
