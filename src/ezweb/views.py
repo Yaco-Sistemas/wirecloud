@@ -53,6 +53,7 @@ from catalogue.models import CatalogueResource
 from gadget.models import Gadget, XHTML
 from workspace.models import WorkSpace
 
+OLD_BROWSERS = {'MSIE 7.0': 'Internet Explorer 7.0'}
 
 @login_required
 def index(request, user_name=None, template="index.html"):
@@ -374,6 +375,10 @@ def manage_groups(user, groups):
 
 def render_ezweb(request, user_name=None, template='index.html', public_workspace='', last_user='', post_load_script='[]'):
     """ Main view """
+    for browser in OLD_BROWSERS:
+        if browser in request.META['HTTP_USER_AGENT']:
+            return render_to_response('old_browser.html', {'browser': OLD_BROWSERS[browser]},
+                                       context_instance=RequestContext(request))
 
     if request.META['HTTP_USER_AGENT'].find("iPhone") >= 0 or request.META['HTTP_USER_AGENT'].find("iPod") >= 0:
         request.session['policies'] = "null"
