@@ -167,18 +167,18 @@ def setActiveWorkspaceByPriority(user, workspaces=None):
     students = False
 
     for ws in workspaces:
-        if ws.name == 'PDI':
-            pdi = ws
-            break
-        elif ws.name == 'PAS':
+        if ws.name == 'PAS':
             pas = ws
+            break
+        elif ws.name == 'PDI':
+            pdi = ws
         elif ws.name == 'Estudiantes':
             students = ws
 
-    if pdi:
-        setActiveWorkspace(user, pdi)
-    elif pas:
+    if pas:
         setActiveWorkspace(user, pas)
+    elif pdi:
+        setActiveWorkspace(user, pdi)
     elif students:
         setActiveWorkspace(user, students)
     else:
