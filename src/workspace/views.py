@@ -167,10 +167,10 @@ def setActiveWorkspaceByPriority(user, workspaces=None):
     students = False
 
     for ws in workspaces:
-        if ws.name == 'PAS':
+        if ws.name.endswith('PAS'):
             pas = ws
             break
-        elif ws.name == 'PDI':
+        elif ws.name.endswith('PDI'):
             pdi = ws
         elif ws.name == 'Estudiantes':
             students = ws
@@ -275,6 +275,22 @@ class WorkSpaceCollection(Resource):
 
             raise TracedServerError(e, "bad creation of default workspaces", request, msg)
 
+        def custom_sort(x, y):
+            if x.name.endswith('PAS'):
+                return -1
+            elif y.name.endswith('PAS'):
+                return 1
+            elif x.name.endswith('PDI'):
+                return -1
+            elif y.name.endswith('PDI'):
+                return 1
+            elif x.name == 'Estudiantes':
+                return -1
+            elif y.name == 'Estudiantes':
+                return 1
+            return 1
+        workspaces = list(workspaces)
+        workspaces.sort(custom_sort)
         workspace_list = [get_workspace_data(workspace, user) for workspace in workspaces]
         data_list['workspaces'] = workspace_list
 
